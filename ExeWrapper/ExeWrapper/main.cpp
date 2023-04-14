@@ -10,14 +10,13 @@ int WinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPSTR lpCmdLine,
     _In_ int nShowCmd)
-//int main()
 {
 
     printf("Going to Start Executable......\n");
 
     LPCSTR executableImage0 = "C:/Program Files/Eclipse Adoptium/jdk-11.0.15.10-hotspot/bin/java.exe\0";
 
-    char command0Buff[1000] = " -jar \"D:/My Git/Tools/Podman/MinimalTCPServer/Image/MinimalTCPServer-1.0.jar\"\0";
+    char command0Buff[500] = " -jar \"D:/My Git/Tools/Podman/MinimalTCPServer/Image/MinimalTCPServer-1.0.jar\"\0";
     LPSTR command0 = command0Buff;
 
     char command1Buff[50] = " --version\0";
@@ -53,10 +52,14 @@ int WinMain(_In_ HINSTANCE hInstance,
     // Wait until child process exits.
     WaitForSingleObject(pi.hProcess, INFINITE);
 
+
     // Close process and thread handles. 
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
     return 0;
 }
+
+
+
 
