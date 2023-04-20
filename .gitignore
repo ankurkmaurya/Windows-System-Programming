@@ -2,6 +2,13 @@ ExeWrapper/.vs/
 ExeWrapper/packages/
 ExeWrapper/ExeWrapper/x64/
 ExeWrapper/ExeWrapper/Generated Files/
+
 PEFormatReader/bin/
 PEFormatReader/.settings/
+
+ExeServiceWrapper/.vs/
+ExeServiceWrapper/packages/
+ExeServiceWrapper/ExeServiceWrapper/x64/
+ExeServiceWrapper/ExeServiceWrapper/Generated Files/
+
 
