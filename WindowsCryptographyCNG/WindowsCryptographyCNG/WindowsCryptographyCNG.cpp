@@ -12,10 +12,7 @@
 #include <winfile.h>
 
 
-int main(){
-    //LPCWSTR filePath = L"D:/txn_cardlist_EBAN000005.txt";
-    LPCWSTR filePath = L"D:/10012025105717.zip";
-
+static int getFileSHA256Hash(LPCWSTR filePath) {
     BYTE readBuffer[1024] = { 0 };
     char sha256[] = "SHA-256";
 
@@ -51,10 +48,22 @@ int main(){
     printf("Hash Length: %d\n", hashLength);
     printf("Hash Value: ");
     for (DWORD i = 0; i < hashLength; ++i) {
-        printf("%c", *(pbHashHexValue+i));
+        printf("%c", *(pbHashHexValue + i));
     }
     printf("\n");
     freeHashHexValueBuffer(&pbHashHexValue);
+}
+
+
+int main() {
+    LPCWSTR fileToBeHashedPath = L"D:/10012025105717.zip";
+    getFileSHA256Hash(fileToBeHashedPath);
+
+
+
+
+
+
 }
 
 
