@@ -12,3 +12,6 @@ DWORD getHashHexValue(PBYTE* pbHashHexValue);
 void freeHashValueBuffer(bool cleanHashBuffer);
 void freeHashHexValueBuffer(PBYTE * pbHashHexValuePtr);
 
+void encrypt();
+
+

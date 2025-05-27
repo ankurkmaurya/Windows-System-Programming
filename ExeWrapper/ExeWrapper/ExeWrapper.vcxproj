@@ -10,7 +10,7 @@
     <ProjectGuid>{4e61e4b1-d362-4253-84ed-3ea0983d8ea8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ExeManager</RootNamespace>
-    <WindowsTargetPlatformVersion Condition=" '$(WindowsTargetPlatformVersion)' == '' ">10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition=" '$(WindowsTargetPlatformVersion)' == '' ">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.17134.0</WindowsTargetPlatformMinVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

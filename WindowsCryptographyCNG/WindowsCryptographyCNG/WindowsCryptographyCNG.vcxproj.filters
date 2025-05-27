@@ -24,6 +24,9 @@
     <ClCompile Include="headers\FileReadWrite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SymmetricAES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\wincrypto.h">

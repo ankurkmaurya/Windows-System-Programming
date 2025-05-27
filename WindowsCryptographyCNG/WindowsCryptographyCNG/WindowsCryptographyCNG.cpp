@@ -56,10 +56,10 @@ static int getFileSHA256Hash(LPCWSTR filePath) {
 
 
 int main() {
-    LPCWSTR fileToBeHashedPath = L"D:/10012025105717.zip";
-    getFileSHA256Hash(fileToBeHashedPath);
+    //LPCWSTR fileToBeHashedPath = L"D:/10012025105717.zip";
+    //getFileSHA256Hash(fileToBeHashedPath);
 
-
+    encrypt();
 
 
 

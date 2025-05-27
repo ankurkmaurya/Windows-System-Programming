@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Windows Kits\10\Cryptographic Provider Development Kit\Include;C:\Users\ankur.maurya\source\repos\WindowsCryptographyCNG\WindowsCryptographyCNG\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Windows Kits\10\Cryptographic Provider Development Kit\Include;D:\Karyasthal\git-repos\Windows-System-Programming\WindowsCryptographyCNG\WindowsCryptographyCNG\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="HashingDataCNG.cpp" />
     <ClCompile Include="headers\FileReadWrite.cpp" />
+    <ClCompile Include="SymmetricAES.cpp" />
     <ClCompile Include="WindowsCryptographyCNG.cpp" />
   </ItemGroup>
   <ItemGroup>
