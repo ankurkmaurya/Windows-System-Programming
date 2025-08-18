@@ -1,0 +1,36 @@
+
+How to setup Debugging connectivity between Development and Test machine using WinDbg
+	A On the host (developer) machine, open Command Prompt as Administrator, then run:
+		Command : bcdedit /dbgsettings net hostip:192.168.2.27 port:50000
+		Output  : Key=3g0w9w9agseyq.rhw0hteo338r.281qq25epw5md.3lvsml0cqwh59
+		
+	B Note Key value from the above step and On the target machine, apply the same key manually using:
+	   Command : bcdedit /dbgsettings net hostip:192.168.2.27 port:50000 key:3g0w9w9agseyq.rhw0hteo338r.281qq25epw5md.3lvsml0cqwh59
+
+	C Then Restart the target machine.
+
+	D Open windbg.exe on the developer machine and select Kernel Debug menu
+	  In the Kernel Debugging dialog select NET tab then provide Port Number and configured Key 
+	
+	
+	
+If you can't see the KdPrint logs check, Is Global DbgPrint Filtering Enabled?
+	Windows 10 and later can filter out DbgPrint / KdPrint output unless the filter is disabled.
+	Run this command in WinDbg to check and enable debug print filtering:
+	ed nt!Kd_Default_Mask 0xFFFFFFFF	
+
+
+View the Memory Contents of target machine through WinDbg
+	Assuming you know the address (say ffffc00123456000) and size (say 0x64 or 100 bytes), use the following:
+	a. View as Hex (bytes)
+	   db FFFFE2859469D090 L80
+		db               :  Dump Bytes — display memory as bytes (in hex + ASCII)
+		FFFFE2859469D090 :  Starting address to dump from
+		L80	             :  Length — dump 0x80 (128) bytes
+
+	b. View as Unicode String
+	   du ffffc00123456000
+		du	             : Dump Unicode string — interprets memory as WCHAR[] (wide chars)
+		ffffc00123456000 : Memory address to dump from
+
+
