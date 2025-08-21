@@ -34,3 +34,39 @@ View the Memory Contents of target machine through WinDbg
 		ffffc00123456000 : Memory address to dump from
 
 
+Set a Breakpoint at Your Function
+	A: To set a breakpoint at a specific function:
+		bp MyModule!MyFunction
+		bp Sample!SampleDeviceControl
+
+	B: Run the program:
+		g
+		
+	C: When breakpoint hits, step into: 't' or step over: 'p'
+		
+
+View or Remove Breakpoints
+	1. List all breakpoints:
+		bl
+
+	2. Remove a specific breakpoint:
+		bc <number>
+		Example:
+		bc 0
+
+	3. Remove all breakpoints:
+		bc *
+
+	4. Disable a breakpoint (without deleting it):
+		bd <number>
+		Example:
+		bd 0
+
+	5. Enable a disabled breakpoint:
+		be <number>
+		Example:
+		be 0
+
+
+
+
