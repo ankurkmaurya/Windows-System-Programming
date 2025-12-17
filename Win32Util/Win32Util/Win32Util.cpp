@@ -3,6 +3,7 @@
 #include <wmiquery.h>
 #include <telnet.h>
 #include <ping.h>
+#include <servicescm.h>
 
 
 int main(int argc, char* argv[])
@@ -95,6 +96,11 @@ int main(int argc, char* argv[])
             option = argv[i];
             port = argv[i] + 5;
         }
+        else if (strncmp(argv[i], "serv=", 5) == 0)
+        {
+            option = argv[i];
+        }
+
 
         //std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
     }
@@ -136,7 +142,12 @@ int main(int argc, char* argv[])
         Ping ping;
         ping.checkIPConnectivity(ipAddress);
     }
+    else if (strcmp(command, "service") == 0) {
 
+        ServicesSCM servicesSCM;
+        servicesSCM.getAllServiceDetails();
+
+    }
 
 
     return 0;

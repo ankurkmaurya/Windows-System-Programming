@@ -23,9 +23,13 @@
     <ClCompile Include="ping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="servicescm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\telnet.h" />
     <ClInclude Include="headers\ping.h" />
+    <ClInclude Include="headers\servicescm.h" />
   </ItemGroup>
 </Project>

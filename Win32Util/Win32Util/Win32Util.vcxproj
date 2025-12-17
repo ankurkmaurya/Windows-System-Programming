@@ -129,12 +129,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ping.cpp" />
+    <ClCompile Include="servicescm.cpp" />
     <ClCompile Include="telnet.cpp" />
     <ClCompile Include="Win32Util.cpp" />
     <ClCompile Include="wmiquery.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\ping.h" />
+    <ClInclude Include="headers\servicescm.h" />
     <ClInclude Include="headers\telnet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
