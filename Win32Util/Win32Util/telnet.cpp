@@ -12,7 +12,7 @@ void Telnet::checkIPAndPortConnectivity(const char* host, const char* port) {
     WSADATA wsaData;
     int wsaResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsaResult != 0) {
-        std::cerr << "WSAStartup Failed : " << wsaResult << std::endl;
+        std::cerr << "Error : WSAStartup Failed - " << wsaResult << std::endl;
         return;
     }
 
@@ -25,7 +25,7 @@ void Telnet::checkIPAndPortConnectivity(const char* host, const char* port) {
     addrinfo* result = nullptr;
     int res = getaddrinfo(host, port, &hints, &result);
     if (res != 0) {
-        std::cerr << "Getaddrinfo Failed : " << gai_strerrorA(res) << std::endl;
+        std::cerr << "Error : Getaddrinfo Failed - " << gai_strerrorA(res) << std::endl;
         WSACleanup();
         return;
     }
@@ -33,7 +33,7 @@ void Telnet::checkIPAndPortConnectivity(const char* host, const char* port) {
     // Create socket
     SOCKET sock = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (sock == INVALID_SOCKET) {
-        std::cerr << "Socket Creation Failed : " << WSAGetLastError() << std::endl;
+        std::cerr << "Error : Socket Creation Failed - " << WSAGetLastError() << std::endl;
         freeaddrinfo(result);
         WSACleanup();
         return;
@@ -43,7 +43,7 @@ void Telnet::checkIPAndPortConnectivity(const char* host, const char* port) {
     std::cout << "Connecting to " << host << ":" << port << "..." << std::endl;
     // Attempt connection
     if (connect(sock, result->ai_addr, (int)result->ai_addrlen) == SOCKET_ERROR) {
-        std::cerr << "Connection Failed : " << WSAGetLastError() << std::endl;
+        std::cerr << "Error : Connection Failed - " << WSAGetLastError() << std::endl;
         closesocket(sock);
         freeaddrinfo(result);
         WSACleanup();

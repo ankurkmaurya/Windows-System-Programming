@@ -23,14 +23,14 @@ void Ping::checkIPConnectivity(const char* host) {
     // Convert IP string → DWORD using InetPtonA
     in_addr addr;
     if (InetPtonA(AF_INET, host, &addr) != 1) {
-        std::cerr << "Invalid IP address format" << std::endl;
+        std::cerr << "Error : Invalid IP address format" << std::endl;
         return;
     }
     DWORD ip = addr.S_un.S_addr;
 
     hIcmpFile = IcmpCreateFile();
     if (hIcmpFile == INVALID_HANDLE_VALUE) {
-        std::cerr << "Unable to open ICMP handle." << std::endl;
+        std::cerr << "Error : Unable to open ICMP handle." << std::endl;
         return;
     }
 
@@ -54,7 +54,7 @@ void Ping::checkIPConnectivity(const char* host) {
             << std::endl;
     } 
     else {
-        std::cout << "Request timed out." << std::endl;
+        std::cout << "Error : Request timed out." << std::endl;
     }
 
     IcmpCloseHandle(hIcmpFile);

@@ -14,57 +14,46 @@ std::string WMIQuery::getWMIQueryFromOption(char* option) {
     if (strcmp(option, "cpu") == 0)
     {
         wmiQuery.append("Win32_Processor");
-        //return "SELECT * FROM Win32_Processor";
     } 
     else if (strcmp(option, "logical.disk") == 0)
     {
         wmiQuery.append("Win32_LogicalDisk");
-        //return "SELECT * FROM Win32_LogicalDisk";
     } 
     else if (strcmp(option, "disk.drive") == 0)
     {
         wmiQuery.append("Win32_DiskDrive");
-        //return "SELECT * FROM Win32_DiskDrive";
     }
     else if (strcmp(option, "disk.partition") == 0)
     {
         wmiQuery.append("Win32_DiskPartition");
-        //return "SELECT * FROM Win32_DiskPartition";
     }
     else if (strcmp(option, "physical.memory") == 0)
     {
         wmiQuery.append("Win32_PhysicalMemory");
-        //return "SELECT * FROM Win32_PhysicalMemory";
     }
     else if (strcmp(option, "computer.system") == 0)
     {
         wmiQuery.append("Win32_ComputerSystem");
-        //return "SELECT * FROM Win32_ComputerSystem";
     }
     else if (strcmp(option, "operating.system") == 0)
     {
         wmiQuery.append("Win32_OperatingSystem");
-        //return "SELECT * FROM Win32_OperatingSystem";
     }
     else if (strcmp(option, "os.hot.fixes") == 0)
     {
-        wmiQuery.append("Win32_OperatingSystem");
-        //return "SELECT * FROM Win32_OperatingSystem";
+        wmiQuery.append("Win32_QuickFixEngineering");
     }
     else if (strcmp(option, "network.interface") == 0)
     {
         wmiQuery.append("Win32_NetworkAdapter");
-        return "SELECT * FROM Win32_NetworkAdapter";
     }
     else if (strcmp(option, "bios") == 0)
     {
         wmiQuery.append("Win32_BIOS");
-        return "SELECT * FROM Win32_BIOS";
     }
     else if (strcmp(option, "system.users") == 0)
     {
         wmiQuery.append("Win32_SystemUsers");
-        return "SELECT * FROM Win32_SystemUsers";
     }
     return wmiQuery;
 }
