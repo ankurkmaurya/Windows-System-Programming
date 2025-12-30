@@ -588,7 +588,7 @@ bool ServicesSCM::serviceStart(char* serviceName)
     }
 
     if (qsc->dwStartType == SERVICE_DISABLED) {
-        printf("Cannot start Service: Service is disabled.\n");
+        printf("Error : Cannot start Service, Service is disabled.\n");
         free(qsc);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
@@ -607,7 +607,7 @@ bool ServicesSCM::serviceStart(char* serviceName)
     }
 
     if (ssStatus.dwCurrentState == SERVICE_RUNNING) {
-        printf("Service already running.\n");
+        printf("Error : Service already running.\n");
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
         return true;
@@ -616,7 +616,7 @@ bool ServicesSCM::serviceStart(char* serviceName)
     // Attempt to start the service
     if (!StartService(service, 0, nullptr)) {
         DWORD err = GetLastError();
-        printf("StartService failed (%lu)\n", err);
+        printf("Error : StartService failed (%lu)\n", err);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
         return false;
@@ -626,7 +626,7 @@ bool ServicesSCM::serviceStart(char* serviceName)
     do {
         Sleep(500);
         if (!QueryServiceStatusEx(service, SC_STATUS_PROCESS_INFO, (LPBYTE)&ssStatus, sizeof(ssStatus), &bytesNeededStatus)) {
-            printf("QueryServiceStatusEx failed (%lu)\n", GetLastError());
+            printf("Error : QueryServiceStatusEx failed (%lu)\n", GetLastError());
             break;
         }
     } while (ssStatus.dwCurrentState == SERVICE_START_PENDING);
@@ -634,7 +634,7 @@ bool ServicesSCM::serviceStart(char* serviceName)
     if (ssStatus.dwCurrentState == SERVICE_RUNNING)
         printf("Service Started Successfully.\n");
     else
-        printf("Service Failed to Start.\n");
+        printf("Error : Service Failed to Start.\n");
 
     CloseServiceHandle(service);
     CloseServiceHandle(scm);
@@ -673,14 +673,14 @@ bool ServicesSCM::serviceStop(char* serviceName)
     }
 
     if (ssStatus.dwCurrentState == SERVICE_STOPPED) {
-        printf("Service already stopped.\n");
+        printf("Error : Service already stopped.\n");
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
         return true;
     }
 
     if (!ControlService(service, SERVICE_CONTROL_STOP, (LPSERVICE_STATUS)&ssStatus)) {
-        printf("ControlService failed (%lu)\n", GetLastError());
+        printf("Error : ControlService failed (%lu)\n", GetLastError());
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
         return false;
@@ -690,7 +690,7 @@ bool ServicesSCM::serviceStop(char* serviceName)
     while (ssStatus.dwCurrentState != SERVICE_STOPPED) {
         Sleep(500);
         if (!QueryServiceStatusEx(service, SC_STATUS_PROCESS_INFO, (LPBYTE)&ssStatus, sizeof(ssStatus), &bytesNeeded)) {
-            printf("QueryServiceStatusEx failed (%lu)\n", GetLastError());
+            printf("Error : QueryServiceStatusEx failed (%lu)\n", GetLastError());
             break;
         }
     }
