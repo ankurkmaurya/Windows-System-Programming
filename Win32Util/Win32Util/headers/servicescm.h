@@ -4,11 +4,11 @@ class ServicesSCM
 {
 
 public:
-    void getAllServiceDetails(char* format);
+    void printAllServiceDetails(char* format);
 
-    void getServiceDetails(char* serviceName, char* format);
+    void printServiceDetails(char* serviceName, char* format);
 
-    void getServiceDescription(char* serviceName);
+    void printServiceDescription(char* serviceName);
 
     void serviceInstall(char* serviceName,
         char* serviceDisplayName,

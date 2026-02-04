@@ -29,11 +29,15 @@
     <ClCompile Include="apputil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="netact.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\telnet.h" />
     <ClInclude Include="headers\ping.h" />
     <ClInclude Include="headers\servicescm.h" />
     <ClInclude Include="headers\apputil.h" />
+    <ClInclude Include="headers\netact.h" />
   </ItemGroup>
 </Project>

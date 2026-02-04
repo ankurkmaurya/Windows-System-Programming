@@ -1,16 +1,19 @@
 ﻿
 #include <windows.h>
+#include <sstream>
 #include <iostream>
 #include <comdef.h>
 #include <Wbemidl.h>
 #include <wmiquery.h>
+#include "apputil.h"
 
 #pragma comment(lib, "wbemuuid.lib")
 
 
-std::string WMIQuery::getWMIQueryFromOption(char* option) {
+std::string WMIQuery::getWMIQueryFromOption(char* option, char* key, char* value) {
     std::string wmiQuery = "SELECT * FROM ";
 
+    //Set the Query Class
     if (strcmp(option, "cpu") == 0)
     {
         wmiQuery.append("Win32_Processor");
@@ -55,14 +58,30 @@ std::string WMIQuery::getWMIQueryFromOption(char* option) {
     {
         wmiQuery.append("Win32_SystemUsers");
     }
+    else if (strcmp(option, "process") == 0)
+    {
+        wmiQuery.append("Win32_Process");
+    }
+
+
+    //Set the Query Limit parameter
+    if (strcmp(key, "all") != 0)
+    {
+        wmiQuery.append(" WHERE ");
+        wmiQuery.append(key);
+        wmiQuery.append("='");
+        wmiQuery.append(value);
+        wmiQuery.append("'");
+    }
+
     return wmiQuery;
 }
 
 
-void WMIQuery::readVTArrayData(VARIANT vtProp) {
+std::string WMIQuery::readVTArrayData(VARIANT vtProp) {
     if (vtProp.vt != (VT_ARRAY | VT_I4) &&
         vtProp.vt != (VT_ARRAY | VT_BSTR)) {
-        return;
+        return "{}"; // Return empty array representation
     }
 
     SAFEARRAY* psa = vtProp.parray;
@@ -70,36 +89,138 @@ void WMIQuery::readVTArrayData(VARIANT vtProp) {
     HRESULT hr = SafeArrayGetLBound(psa, 1, &lBound);
     hr = SafeArrayGetUBound(psa, 1, &uBound);
 
-    std::cout << "{";
-    for (long i = lBound; i <= uBound; i++)
-    {
-        if (i > 0) {
-            std::cout << ",";
+    std::ostringstream oss;
+    oss << "{";
+
+    for (long i = lBound; i <= uBound; i++) {
+        if (i > lBound) {  // use lBound instead of 0 for safety
+            oss << ",";
         }
 
         if (vtProp.vt == (VT_ARRAY | VT_I4)) {
-            LONG value = 0;   // VT_I4 → LONG
+            LONG value = 0;
             hr = SafeArrayGetElement(psa, &i, &value);
-            if (SUCCEEDED(hr))
-            {
-                std::cout << value;
+            if (SUCCEEDED(hr)) {
+                oss << value;
             }
         }
         else if (vtProp.vt == (VT_ARRAY | VT_BSTR)) {
             BSTR bstrValue = nullptr;
             hr = SafeArrayGetElement(psa, &i, &bstrValue);
-            if (SUCCEEDED(hr) && bstrValue != nullptr)
-            {
-                std::wcout << "\"" << bstrValue << "\"";
-                SysFreeString(bstrValue);
+            if (SUCCEEDED(hr) && bstrValue != nullptr) {
+                // Convert BSTR to UTF-8 std::string
+                //_bstr_t tmp(bstrValue, false); // Attach BSTR and auto free
+                oss << "\"" << AppUtil::convertBSTRToString(bstrValue) << "\"";
             }
         }
     }
-    std::cout << "}";
+
+    oss << "}";
+    return oss.str();
+}
+
+void WMIQuery::printQueryDetailsHorizontally(IWbemClassObject* pclsObj, SAFEARRAY* pNames) {
+    long lBound, uBound;
+    SafeArrayGetLBound(pNames, 1, &lBound);
+    SafeArrayGetUBound(pNames, 1, &uBound);
+
+    for (long i = lBound; i <= uBound; i++) {
+        BSTR bstrName;
+        SafeArrayGetElement(pNames, &i, &bstrName);
+
+        VARIANT vtProp;
+        VariantInit(&vtProp);
+
+        HRESULT hr = pclsObj->Get(bstrName, 0, &vtProp, 0, 0);
+        if (SUCCEEDED(hr)) {
+            // Print property name and value
+            std::wcout << bstrName << L"=";
+            switch (vtProp.vt) {
+            case VT_BSTR: std::wcout << vtProp.bstrVal; break;
+            case VT_I4: std::wcout << vtProp.intVal; break;
+            case VT_UI4: std::wcout << vtProp.uintVal; break;
+            case VT_BOOL: std::wcout << (vtProp.boolVal ? L"TRUE" : L"FALSE"); break;
+            case VT_ARRAY | VT_I4: std::cout << readVTArrayData(vtProp); break;
+            case VT_ARRAY | VT_BSTR: std::cout << readVTArrayData(vtProp); break;
+            default: std::wcout << L""; break;
+            }
+            std::wcout << std::endl;
+        }
+        VariantClear(&vtProp);
+        SysFreeString(bstrName);
+    }
+    SafeArrayDestroy(pNames);
 }
 
 
-void WMIQuery::printWMIQueryResults(std::string wmiQuery) {
+
+void WMIQuery::printQueryDetailsVertically(IWbemClassObject* pclsObj, SAFEARRAY* pNames, BOOL headerPrinted) {
+    long lBound, uBound;
+    SafeArrayGetLBound(pNames, 1, &lBound);
+    SafeArrayGetUBound(pNames, 1, &uBound);
+
+    if (!headerPrinted) {
+        // First, print header (property names)
+        for (long i = lBound; i <= uBound; i++) {
+            BSTR bstrName = nullptr;
+            SafeArrayGetElement(pNames, &i, &bstrName);
+
+            if (i > lBound) std::wcout << L"~"; // comma separator
+            std::wcout << (bstrName ? bstrName : L"");
+
+            SysFreeString(bstrName);
+        }
+        std::wcout << std::endl;
+    } 
+
+    // Then, print values
+    for (long j = lBound; j <= uBound; j++) {
+        BSTR bstrName1 = nullptr;
+        SafeArrayGetElement(pNames, &j, &bstrName1);
+
+        VARIANT vtProp;
+        VariantInit(&vtProp);
+
+        HRESULT hr = pclsObj->Get(bstrName1, 0, &vtProp, 0, 0);
+        if (j > lBound) std::wcout << L"~"; // comma separator
+
+        if (SUCCEEDED(hr)) {
+            switch (vtProp.vt) {
+            case VT_BSTR:
+                std::wcout << (vtProp.bstrVal ? vtProp.bstrVal : L"");
+                break;
+            case VT_I4:
+                std::wcout << vtProp.intVal;
+                break;
+            case VT_UI4:
+                std::wcout << vtProp.uintVal;
+                break;
+            case VT_BOOL:
+                std::wcout << (vtProp.boolVal ? L"TRUE" : L"FALSE");
+                break;
+            case VT_ARRAY | VT_I4:
+            case VT_ARRAY | VT_BSTR: {
+                std::string arrayStr = readVTArrayData(vtProp); // returns std::string
+                std::wcout << std::wstring(arrayStr.begin(), arrayStr.end());
+                break;
+            }
+            default:
+                std::wcout << L"";
+                break;
+            }
+        }
+
+        VariantClear(&vtProp);
+        SysFreeString(bstrName1);
+    }
+    std::wcout << std::endl;
+
+    SafeArrayDestroy(pNames);
+}
+
+
+
+void WMIQuery::printWMIQueryResults(std::string wmiQuery, char* format) {
     HRESULT hres;
 
     // Initialize COM
@@ -151,6 +272,7 @@ void WMIQuery::printWMIQueryResults(std::string wmiQuery) {
       NetworkInterface       -> SELECT * FROM Win32_NetworkAdapter
       BIOS                   -> SELECT * FROM Win32_BIOS
       SystemUsers            -> SELECT * FROM Win32_SystemUsers
+      Process                -> SELECT * FROM Win32_Process
 
       std::string wmiQuery = "SELECT * FROM Win32_SystemUsers";
     *
@@ -169,6 +291,7 @@ void WMIQuery::printWMIQueryResults(std::string wmiQuery) {
 
     IWbemClassObject* pclsObj = NULL;
     ULONG uReturn = 0;
+    BOOL headerPrinted = false;
     while (pEnumerator) {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
         if (0 == uReturn) break;
@@ -177,36 +300,17 @@ void WMIQuery::printWMIQueryResults(std::string wmiQuery) {
         SAFEARRAY* pNames = NULL;
         hr = pclsObj->GetNames(NULL, WBEM_FLAG_ALWAYS | WBEM_FLAG_NONSYSTEM_ONLY, NULL, &pNames);
         if (SUCCEEDED(hr) && pNames != NULL) {
-            long lBound, uBound;
-            SafeArrayGetLBound(pNames, 1, &lBound);
-            SafeArrayGetUBound(pNames, 1, &uBound);
 
-            for (long i = lBound; i <= uBound; i++) {
-                BSTR bstrName;
-                SafeArrayGetElement(pNames, &i, &bstrName);
-
-                VARIANT vtProp;
-                VariantInit(&vtProp);
-
-                hr = pclsObj->Get(bstrName, 0, &vtProp, 0, 0);
-                if (SUCCEEDED(hr)) {
-                    // Print property name and value
-                    std::wcout << bstrName << L"=";
-                    switch (vtProp.vt) {
-                    case VT_BSTR: std::wcout << vtProp.bstrVal; break;
-                    case VT_I4: std::wcout << vtProp.intVal; break;
-                    case VT_UI4: std::wcout << vtProp.uintVal; break;
-                    case VT_BOOL: std::wcout << (vtProp.boolVal ? L"TRUE" : L"FALSE"); break;
-                    case VT_ARRAY | VT_I4: readVTArrayData(vtProp); break;
-                    case VT_ARRAY | VT_BSTR: readVTArrayData(vtProp); break;
-                    default: std::wcout << L""; break;
-                    }
-                    std::wcout << std::endl;
-                }
-                VariantClear(&vtProp);
-                SysFreeString(bstrName);
+            if (strcmp(format, "horizontal") == 0) {
+                printQueryDetailsHorizontally(pclsObj, pNames);
+            } 
+            else if (strcmp(format, "vertical") == 0) {
+                printQueryDetailsVertically(pclsObj, pNames, headerPrinted);
+                headerPrinted = true;
+            } 
+            else {
+                printf("Error : Found Invalid Format Type for WMI Query.\n");
             }
-            SafeArrayDestroy(pNames);
         }
 
         pclsObj->Release();

@@ -1,4 +1,5 @@
 ﻿
+#include <netact.h>
 #include <cstring>
 #include <wmiquery.h>
 #include <telnet.h>
@@ -8,14 +9,18 @@
 
 int main(int argc, char* argv[])
 {
+
     //std::cout << "Argument count: " << argc << "\n";
     char* command = NULL;
     char* option = NULL;
 
+    char* queryKey = NULL;
+    char* queryValue = NULL;
+    char* queryFormat = NULL;
+
     char* ipAddress = NULL;
     char* port = NULL;
 
-    char* serviceQueryFormat = NULL;
     char* serviceName = NULL;
     char* serviceDisplayName = NULL;
     char* serviceDescription = NULL;
@@ -33,27 +38,29 @@ int main(int argc, char* argv[])
             std::cout << std::endl;
 
             std::cout << "Commands Available - " << std::endl;
-            std::cout << "1. wmi      : Provides system information." << std::endl;
-            std::cout << "2. telnet   : Provides functionality to test connectivity with IP and Port." << std::endl;
-            std::cout << "3. ping     : Provides functionality to test connectivity with host." << std::endl;
-            std::cout << "4. service  : Provides managing window services through Service Control Manager (SCM)." << std::endl;
-            std::cout << "5. -help    : Provides usage guide." << std::endl;
-            std::cout << "6. -version : Displays application version information." << std::endl;
+            std::cout << "1. wmi        : Provides system information." << std::endl;
+            std::cout << "2. telnet     : Provides functionality to test connectivity with IP and Port." << std::endl;
+            std::cout << "3. ping       : Provides functionality to test connectivity with host." << std::endl;
+            std::cout << "4. service    : Provides managing window services through Service Control Manager (SCM)." << std::endl;
+            std::cout << "5. netact     : Provides network activity details of the system with Process information." << std::endl;
+            std::cout << "6. -help      : Provides usage guide." << std::endl;
+            std::cout << "7. -version   : Displays application version information." << std::endl;
             std::cout << std::endl;
 
             std::cout << "Command Options - " << std::endl;
             std::cout << "1. wmi command options" << std::endl;
-            std::cout << "    cpu" << std::endl;
-            std::cout << "    logical.disk" << std::endl;
-            std::cout << "    disk.drive" << std::endl;
-            std::cout << "    disk.partition" << std::endl;
-            std::cout << "    physical.memory" << std::endl;
-            std::cout << "    computer.system" << std::endl;
-            std::cout << "    operating.system" << std::endl;
-            std::cout << "    os.hot.fixes" << std::endl;
-            std::cout << "    network.interface" << std::endl;
-            std::cout << "    bios" << std::endl;
-            std::cout << "    system.users" << std::endl;
+            std::cout << "    cpu key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    logical.disk key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    disk.drive key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    disk.partition key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    physical.memory key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    computer.system key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    operating.system key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    os.hot.fixes key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    network.interface key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    bios key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    system.users key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
+            std::cout << "    process key=all/xxxx value=xxxx format=vertical/horizontal" << std::endl;
             std::cout << std::endl;
 
             std::cout << "2. telnet command options" << std::endl;
@@ -77,17 +84,21 @@ int main(int argc, char* argv[])
             std::cout << "    service.description name=xxxx" << std::endl;
             std::cout << std::endl;
 
+            std::cout << "5. netact command options" << std::endl;
+            std::cout << "    tcp key=all/remoteip/localip/remoteport/localport value=xxxx format=vertical/horizontal/tabular" << std::endl;
+
             return 0;
         } 
         else if (strcmp(argv[i], "-version") == 0)
         {
-            std::cout << "Version - 1.0.0, Published - 12 Dec 2025" << std::endl;
+            std::cout << "Version - 1.2.0, Published - 30 Jan 2026" << std::endl;
             return 0;
         }
         else if (strcmp(argv[i], "wmi") == 0 || 
                  strcmp(argv[i], "telnet") == 0 ||
                  strcmp(argv[i], "ping") == 0 || 
-                 strcmp(argv[i], "service") == 0)
+                 strcmp(argv[i], "service") == 0 ||
+                 strcmp(argv[i], "netact") == 0)
         {
             command = argv[i];
         }
@@ -101,7 +112,8 @@ int main(int argc, char* argv[])
             strcmp(argv[i], "os.hot.fixes") == 0 || 
             strcmp(argv[i], "network.interface") == 0 || 
             strcmp(argv[i], "bios") == 0 || 
-            strcmp(argv[i], "system.users") == 0)
+            strcmp(argv[i], "system.users") == 0 || 
+            strcmp(argv[i], "process") == 0)
         {
             option = argv[i];
         }
@@ -130,9 +142,17 @@ int main(int argc, char* argv[])
         {
             option = argv[i];
         }
+        else if (strncmp(argv[i], "key=", 4) == 0)
+        {
+            queryKey = argv[i] + 4;
+        }
+        else if (strncmp(argv[i], "value=", 6) == 0)
+        {
+            queryValue = argv[i] + 6;
+        }
         else if (strncmp(argv[i], "format=", 7) == 0)
         {
-            serviceQueryFormat = argv[i] + 7;
+            queryFormat = argv[i] + 7;
         }
         else if (strncmp(argv[i], "name=", 5) == 0)
         {
@@ -154,6 +174,10 @@ int main(int argc, char* argv[])
         {
             serviceStartType = argv[i] + 5;
         }
+        else if (strcmp(argv[i], "tcp") == 0)
+            {
+                option = argv[i];
+        }
 
         //std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
     }
@@ -174,12 +198,26 @@ int main(int argc, char* argv[])
 
     if (strcmp(command, "wmi") == 0) {
         WMIQuery wmi;
-        std::string wmiQuery = wmi.getWMIQueryFromOption(option);
-        wmi.printWMIQueryResults(wmiQuery);
+
+        if (queryKey == NULL) {
+            std::cout << "Error : key parameter is required for wmi '" << option << "' command." << std::endl;
+            return 1;
+        }
+        else if (queryValue == NULL) {
+            std::cout << "Error : value parameter is required for wmi '" << option << "' command." << std::endl;
+            return 1;
+        }
+        else if (queryFormat == NULL) {
+            std::cout << "Error : format parameter is required for wmi '" << option << "' command." << std::endl;
+            return 1;
+        }
+
+        std::string wmiQuery = wmi.getWMIQueryFromOption(option, queryKey, queryValue);
+        wmi.printWMIQueryResults(wmiQuery, queryFormat);
     } 
     else if (strcmp(command, "telnet") == 0) {
         if (ipAddress == NULL || port == NULL) {
-            std::cout << "Error : ip and port is required for telnet command." << std::endl;
+            std::cout << "Error : ip and port parameter is required for telnet command." << std::endl;
             return 1;
         }
 
@@ -188,7 +226,7 @@ int main(int argc, char* argv[])
     }
     else if (strcmp(command, "ping") == 0) {
         if (ipAddress == NULL) {
-            std::cout << "Error : ip is required for ping command." << std::endl;
+            std::cout << "Error : ip parameter is required for ping command." << std::endl;
             return 1;
         }
 
@@ -198,74 +236,91 @@ int main(int argc, char* argv[])
     else if (strcmp(command, "service") == 0) {
         ServicesSCM servicesSCM;
         if (strcmp(option, "service.query.all") == 0) {
-            if (serviceQueryFormat == NULL) {
-                std::cout << "Error : format is required for all service query command." << std::endl;
+            if (queryFormat == NULL) {
+                std::cout << "Error : format parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             }
-            servicesSCM.getAllServiceDetails(serviceQueryFormat);
+            servicesSCM.printAllServiceDetails(queryFormat);
         } 
         else if (strcmp(option, "service.query") == 0) {
-            if (serviceName == NULL || serviceQueryFormat == NULL) {
-                std::cout << "Error : name and format is required for service query command." << std::endl;
+            if (serviceName == NULL || queryFormat == NULL) {
+                std::cout << "Error : name and format parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             }
-            servicesSCM.getServiceDetails(serviceName, serviceQueryFormat);
+            servicesSCM.printServiceDetails(serviceName, queryFormat);
         }
         else if (strcmp(option, "service.install") == 0) {
             if (serviceName == NULL) {
-                std::cout << "Error : name is required for service install command." << std::endl;
+                std::cout << "Error : name parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             } else if (serviceDisplayName == NULL) {
-                std::cout << "Error : displayname is required for service install command." << std::endl;
+                std::cout << "Error : displayname parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             } else if (serviceDescription == NULL) {
-                std::cout << "Error : description is required for service install command." << std::endl;
+                std::cout << "Error : description parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             } else if (serviceBinaryPath == NULL) {
-                std::cout << "Error : binarypath is required for service install command." << std::endl;
+                std::cout << "Error : binarypath parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             }
             servicesSCM.serviceInstall(serviceName, serviceDisplayName, serviceDescription, serviceBinaryPath);
         }
         else if (strcmp(option, "service.uninstall") == 0) {
             if (serviceName == NULL) {
-                std::cout << "Error : name is required for service uninstall command." << std::endl;
+                std::cout << "Error : name parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             }
             servicesSCM.serviceUnInstall(serviceName);
         }
         else if (strcmp(option, "service.start") == 0) {
             if (serviceName == NULL) {
-                std::cout << "Error : name is required for service start command." << std::endl;
+                std::cout << "Error : name parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             }
             servicesSCM.serviceStart(serviceName);
         }
         else if (strcmp(option, "service.stop") == 0) {
             if (serviceName == NULL) {
-                std::cout << "Error : name is required for service stop command." << std::endl;
+                std::cout << "Error : name parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             }
             servicesSCM.serviceStop(serviceName);
         }
         else if (strcmp(option, "service.startup.type.change") == 0) {
             if (serviceName == NULL || serviceStartType == NULL) {
-                std::cout << "Error : name and type is required for changing service startup type." << std::endl;
+                std::cout << "Error : name and type parameter is required for '" << option << "' command." << std::endl;
                 return 1;
             } 
             servicesSCM.serviceStartupTypeChange(serviceName, serviceStartType);
         }
         else if (strcmp(option, "service.description") == 0) {
             if (serviceName == NULL) {
-                std::cout << "Error : name is required for getting service description." << std::endl;
+                std::cout << "Error : name parameter is required for  '" << option << "' command." << std::endl;
                 return 1;
             }
-            servicesSCM.getServiceDescription(serviceName);
+            servicesSCM.printServiceDescription(serviceName);
+        }
+    }
+    else if (strcmp(command, "netact") == 0) {
+        if (queryKey == NULL) {
+            std::cout << "Error : key parameter is required for tcpnetact '" << option << "' command." << std::endl;
+            return 1;
+        }
+        else if (queryValue == NULL) {
+            std::cout << "Error : value parameter is required for tcpnetact '" << option << "' command." << std::endl;
+            return 1;
+        }
+        else if (queryFormat == NULL) {
+            std::cout << "Error : format parameter is required for tcpnetact '" << option << "' command." << std::endl;
+            return 1;
         }
 
+        NetworkActivity networkActivity;
+        networkActivity.printTCPNetworkActivity(queryKey, queryValue, queryFormat);
     }
 
     return 0;
+    
 }
 
 

@@ -11,5 +11,9 @@ namespace AppUtil {
 
 	LPWSTR convertUTF8ToLPWSTR(char* utf8chars);
 
+	std::string convertBSTRToString(BSTR bstr);
+
 	bool isFileExists(const std::string& filePath);
+
+	std::string wideStrToUTF8(const std::wstring& wstr);
 }

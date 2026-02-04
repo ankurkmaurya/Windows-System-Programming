@@ -80,7 +80,7 @@ BOOL queryServiceConfig(SC_HANDLE hSCM, LPCWSTR serviceName, LPWSTR* binaryPath,
 
     DWORD bytesNeeded = 0;
     BOOL bufferSizeNeeded = QueryServiceConfigW(hService, NULL, 0, &bytesNeeded);
-    if (bytesNeeded==0)
+    if (bufferSizeNeeded == 0 && bytesNeeded == 0)
     {
         printf("Buffer Size Query failed (%lu)\n", GetLastError());
         CloseServiceHandle(hService);
@@ -187,7 +187,7 @@ BOOL isServiceRunning(SC_HANDLE schService) {
 }
 
 
-void ServicesSCM::getAllServiceDetails(char* format) {
+void ServicesSCM::printAllServiceDetails(char* format) {
 
     SC_HANDLE scHandle = OpenSCManager(
         NULL,                    // local machine
@@ -272,7 +272,7 @@ void ServicesSCM::getAllServiceDetails(char* format) {
 
 
 
-void ServicesSCM::getServiceDetails(char* serviceName, char* format)
+void ServicesSCM::printServiceDetails(char* serviceName, char* format)
 {
     LPWSTR serviceNameW = AppUtil::convertUTF8ToLPWSTR(serviceName);
     if (!serviceNameW) return;
@@ -349,7 +349,7 @@ void ServicesSCM::getServiceDetails(char* serviceName, char* format)
 
 
 
-void ServicesSCM::getServiceDescription(char* serviceName)
+void ServicesSCM::printServiceDescription(char* serviceName)
 {
     LPWSTR serviceNameW = AppUtil::convertUTF8ToLPWSTR(serviceName);
     if (!serviceNameW) return;

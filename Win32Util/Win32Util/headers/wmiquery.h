@@ -1,5 +1,4 @@
 
-#include <windows.h>
 #include <iostream>
 #include <comdef.h>
 #include <Wbemidl.h>
@@ -26,13 +25,18 @@ public:
       NetworkInterface       -> network.interface
       BIOS                   -> bios
       SystemUsers            -> system.users
+      Process                -> process
     *
     */
-    std::string getWMIQueryFromOption(char* option);
+    std::string getWMIQueryFromOption(char* option, char* key, char* value);
 
-	void printWMIQueryResults(std::string wmiQuery);
+	void printWMIQueryResults(std::string wmiQuery, char* format);
 
-	void readVTArrayData(VARIANT vtProp);
+    std::string readVTArrayData(VARIANT vtProp);
+
+    void printQueryDetailsHorizontally(IWbemClassObject* pclsObj, SAFEARRAY* pNames);
+
+    void printQueryDetailsVertically(IWbemClassObject* pclsObj, SAFEARRAY* pNames, BOOL headerPrinted);
 };
 
 
