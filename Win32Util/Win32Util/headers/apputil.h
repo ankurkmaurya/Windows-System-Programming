@@ -16,4 +16,6 @@ namespace AppUtil {
 	bool isFileExists(const std::string& filePath);
 
 	std::string wideStrToUTF8(const std::wstring& wstr);
+
+	std::string WCharToUtf8(const wchar_t* wstr);
 }

@@ -80,6 +80,20 @@ namespace AppUtil {
 	}
 
 
+	//Convert wide char to UTF-8
+	std::string WCharToUtf8(const wchar_t* wstr)
+	{
+		if (!wstr) {
+			return "";
+		}
+		
+		int size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
+		std::string result(size - 1, 0);
+		WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &result[0], size, NULL, NULL);
+		return result;
+	}
+
+
 
 }
 

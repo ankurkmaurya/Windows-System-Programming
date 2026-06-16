@@ -5,6 +5,7 @@
 #include <telnet.h>
 #include <ping.h>
 #include <servicescm.h>
+#include <usersession.h>
 
 
 int main(int argc, char* argv[])
@@ -27,6 +28,12 @@ int main(int argc, char* argv[])
     char* serviceBinaryPath = NULL;
     char* serviceStartType = NULL;
 
+    char* programFilePath = NULL;
+    char* programCommandLine = NULL;
+    char* windowMode = NULL;
+
+    char* pId = NULL;
+
 
     for (int i = 1; i < argc; i++)
     {
@@ -38,13 +45,14 @@ int main(int argc, char* argv[])
             std::cout << std::endl;
 
             std::cout << "Commands Available - " << std::endl;
-            std::cout << "1. wmi        : Provides system information." << std::endl;
-            std::cout << "2. telnet     : Provides functionality to test connectivity with IP and Port." << std::endl;
-            std::cout << "3. ping       : Provides functionality to test connectivity with host." << std::endl;
-            std::cout << "4. service    : Provides managing window services through Service Control Manager (SCM)." << std::endl;
-            std::cout << "5. netact     : Provides network activity details of the system with Process information." << std::endl;
-            std::cout << "6. -help      : Provides usage guide." << std::endl;
-            std::cout << "7. -version   : Displays application version information." << std::endl;
+            std::cout << "1. wmi          : Provides system information." << std::endl;
+            std::cout << "2. telnet       : Provides functionality to test connectivity with IP and Port." << std::endl;
+            std::cout << "3. ping         : Provides functionality to test connectivity with host." << std::endl;
+            std::cout << "4. service      : Provides managing window services through Service Control Manager (SCM)." << std::endl;
+            std::cout << "5. netact       : Provides network activity details of the system with Process information." << std::endl;
+            std::cout << "6. usrsesn      : Provides functionality to get system current user session information and start process with specific user session." << std::endl;
+            std::cout << "7. -help        : Provides usage guide." << std::endl;
+            std::cout << "8. -version     : Displays application version information." << std::endl;
             std::cout << std::endl;
 
             std::cout << "Command Options - " << std::endl;
@@ -86,19 +94,30 @@ int main(int argc, char* argv[])
 
             std::cout << "5. netact command options" << std::endl;
             std::cout << "    tcp key=all/remoteip/localip/remoteport/localport value=xxxx format=vertical/horizontal/tabular" << std::endl;
+            std::cout << std::endl;
+
+            std::cout << "6. usrsesn command options" << std::endl;
+            std::cout << "   [Argument containing spaces must be quoted]" << std::endl;
+            std::cout << "    usersession.query.info  format=vertical/horizontal/tabular" << std::endl;
+            std::cout << "    usersession.active.program.launch  windowmode=default/hidden/minimized  programpath=\"xxxxx\\xxxx\\xxx.exe\"  commandline=xxxxx xxx xxxx" << std::endl;
+            std::cout << "    usersession.enumeratewindows  key=all/pid/sessionid/windowstate  value=xxxx  format=vertical/horizontal" << std::endl;
+            std::cout << "      -> key:windowstate  value:foreground/minimized/visible/hidden" << std::endl;
+            std::cout << "    usersession.process.bring.foreground  pid=xxxx" << std::endl;
+            std::cout << std::endl;
 
             return 0;
         } 
         else if (strcmp(argv[i], "-version") == 0)
         {
-            std::cout << "Version - 1.2.0, Published - 30 Jan 2026" << std::endl;
+            std::cout << "Version - 1.4.0, Published - 16 Jun 2026" << std::endl;
             return 0;
         }
         else if (strcmp(argv[i], "wmi") == 0 || 
                  strcmp(argv[i], "telnet") == 0 ||
                  strcmp(argv[i], "ping") == 0 || 
                  strcmp(argv[i], "service") == 0 ||
-                 strcmp(argv[i], "netact") == 0)
+                 strcmp(argv[i], "netact") == 0 ||
+                 strcmp(argv[i], "usrsesn") == 0)
         {
             command = argv[i];
         }
@@ -175,8 +194,40 @@ int main(int argc, char* argv[])
             serviceStartType = argv[i] + 5;
         }
         else if (strcmp(argv[i], "tcp") == 0)
-            {
-                option = argv[i];
+        {
+            option = argv[i];
+        }
+        else if (strcmp(argv[i], "usersession.query.info") == 0)
+        {
+            option = argv[i];
+        }
+        else if (strcmp(argv[i], "usersession.active.program.launch") == 0)
+        {
+            option = argv[i];
+        }
+        else if (strcmp(argv[i], "usersession.enumeratewindows") == 0)
+        {
+            option = argv[i];
+        }
+        else if (strcmp(argv[i], "usersession.process.bring.foreground") == 0)
+        {
+            option = argv[i];
+        }
+        else if (strncmp(argv[i], "programpath=", 12) == 0)
+        {
+            programFilePath = argv[i] + 12;
+        }
+        else if (strncmp(argv[i], "commandline=", 12) == 0)
+        {
+            programCommandLine = argv[i] + 12;
+        }
+        else if (strncmp(argv[i], "windowmode=", 11) == 0)
+        {
+            windowMode = argv[i] + 11;
+        }
+        else if (strncmp(argv[i], "pid=", 4) == 0)
+        {
+            pId = argv[i] + 4;
         }
 
         //std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
@@ -318,6 +369,64 @@ int main(int argc, char* argv[])
         NetworkActivity networkActivity;
         networkActivity.printTCPNetworkActivity(queryKey, queryValue, queryFormat);
     }
+    else if (strcmp(command, "usrsesn") == 0) {
+        UserSession userSession;
+        if (strcmp(option, "usersession.query.info") == 0) {
+            if (queryFormat == NULL) {
+                std::cout << "Error : format parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+            userSession.printUserSessionDetails(queryFormat);
+        }
+        else if (strcmp(option, "usersession.active.program.launch") == 0) {
+            if (programFilePath == NULL) {
+                std::cout << "Error : programpath parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+            else if (programCommandLine == NULL) {
+                std::cout << "Error : commandline parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+            else if (windowMode == NULL) {
+                std::cout << "Error : windowmode parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+
+            WindowMode winMode = userSession.parseWindowMode(windowMode);
+            userSession.launchProgramInActiveUserSession(programFilePath, programCommandLine, winMode);
+        }
+        else if (strcmp(option, "usersession.enumeratewindows") == 0) {
+            if (queryKey == NULL) {
+                std::cout << "Error : key parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+            else if (queryValue == NULL) {
+                std::cout << "Error : value parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+            else if (queryFormat == NULL) {
+                std::cout << "Error : format parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+
+            EnumerateWindowContext context = { 0 };
+            context.format = queryFormat;
+            context.printHeader = true;
+            context.key = queryKey;
+            context.value = queryValue;
+
+            userSession.enumerateWindows(context);
+        }
+        else if (strcmp(option, "usersession.process.bring.foreground") == 0) {
+            if (pId == NULL) {
+                std::cout << "Error : pId parameter is required for usrsesn '" << option << "' command." << std::endl;
+                return 1;
+            }
+            userSession.bringProcessToForeground(pId);
+        }
+    }
+
+
 
     return 0;
     

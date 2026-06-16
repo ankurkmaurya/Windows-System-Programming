@@ -137,6 +137,7 @@
     <ClCompile Include="apputil.cpp" />
     <ClCompile Include="netact.cpp" />
     <ClCompile Include="telnet.cpp" />
+    <ClCompile Include="usersession.cpp" />
     <ClCompile Include="Win32Util.cpp" />
     <ClCompile Include="wmiquery.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="headers\apputil.h" />
     <ClInclude Include="headers\netact.h" />
     <ClInclude Include="headers\telnet.h" />
+    <ClInclude Include="headers\usersession.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
