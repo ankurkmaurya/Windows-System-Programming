@@ -18,8 +18,4 @@ WindowsCryptographyCNG/WindowsCryptographyCNG/Generated Files/
 WindowsCryptographyCNG/WindowsCryptographyCNG/WindowsCryptographyCNG.vcxproj.user
 
 
-Win32Util/.vs/
-Win32Util/x64/
-Win32Util/packages/
-Win32Util/Win32Util/x64/
-Win32Util/Win32Util/Generated Files/
+
