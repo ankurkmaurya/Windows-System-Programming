@@ -14,8 +14,16 @@ WindowsCryptographyCNG/x64/
 WindowsCryptographyCNG/packages/
 WindowsCryptographyCNG/WindowsCryptographyCNG/x64/
 WindowsCryptographyCNG/WindowsCryptographyCNG/Generated Files/
-
 WindowsCryptographyCNG/WindowsCryptographyCNG/WindowsCryptographyCNG.vcxproj.user
+
+WindowsActivityLoggerWithSQLite/.vs/
+WindowsActivityLoggerWithSQLite/x64/
+WindowsActivityLoggerWithSQLite/packages/
+WindowsActivityLoggerWithSQLite/WindowsActivityLoggerWithSQLite/x64/
+WindowsActivityLoggerWithSQLite/WindowsActivityLoggerWithSQLite/Generated Files/
+WindowsActivityLoggerWithSQLite/WindowsActivityLoggerWithSQLite/WindowsCryptographyCNG.vcxproj.user
+
+
 
 
 
